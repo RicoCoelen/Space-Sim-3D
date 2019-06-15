@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28922.388
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaceSim", "SpaceSim\SpaceSim.csproj", "{88D14D75-19D7-497D-916F-4591FF2A7442}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88D14D75-19D7-497D-916F-4591FF2A7442}.Debug|x86.ActiveCfg = Debug|x86
+		{88D14D75-19D7-497D-916F-4591FF2A7442}.Debug|x86.Build.0 = Debug|x86
+		{88D14D75-19D7-497D-916F-4591FF2A7442}.Release|x86.ActiveCfg = Release|x86
+		{88D14D75-19D7-497D-916F-4591FF2A7442}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E95D89C7-9FA7-4956-8589-B3CAD8C49752}
+	EndGlobalSection
+EndGlobal
