@@ -75,9 +75,10 @@ namespace SpaceSim
 
             spheres = new List<Sphere>();
 
-
-            spheres.Add(sun = new Sphere(Matrix.Identity, Color.White, 30));
-
+            // change sun to yellow color
+            spheres.Add(sun = new Sphere(Matrix.Identity, Color.Yellow, 30));
+            // scale the sun 2x
+            sun.Transform = Matrix.CreateScale(2f);
 
 
             base.Initialize();
