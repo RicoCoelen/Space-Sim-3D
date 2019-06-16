@@ -24,6 +24,7 @@ namespace SpaceSim
         public static GraphicsDevice Graphics;
 
         List<Sphere> spheres;
+        List<Bullet> bullets;
 
         // planets
         Sphere sun;
@@ -36,6 +37,10 @@ namespace SpaceSim
         // moons
         Sphere moon;
         double moonRotation = 0;
+
+        // spaceship
+        float rollVelocity = 0;
+        float forwardVelocity = 0;
 
         Spaceship spaceship;
         Vector3 spaceshipPosition = new Vector3(0f, 28f, 77f);
@@ -84,6 +89,7 @@ namespace SpaceSim
             spriteBatch = new SpriteBatch(Graphics);
 
             spheres = new List<Sphere>();
+            bullets = new List<Bullet>();
 
             // change sun to yellow color
             spheres.Add(sun = new Sphere(Matrix.Identity, Color.Yellow, 30));
@@ -166,7 +172,13 @@ namespace SpaceSim
                 sphere.Draw();
             }
 
+            foreach (Bullet bullet in bullets)
+            {
+                bullet.Draw();
+            }
 
+            // draw the spaceship
+            spaceship.Draw();
 
             spriteBatch.Begin(SpriteSortMode.Deferred, BlendState.AlphaBlend, SamplerState.LinearWrap, DepthStencilState.Default, RasterizerState.CullCounterClockwise);
             spriteBatch.Draw(reticle, new Vector2(mousePosition.X - reticleHalfWidth, mousePosition.Y - reticleHalfHeight), Color.White);
@@ -176,6 +188,12 @@ namespace SpaceSim
 
         protected override void Update(GameTime gameTime)
         {
+            screenCenter = new Vector2((float) (Window.ClientBounds.Width/2), (float) (Window.ClientBounds.Height/2));
+
+            // bereken de distance van mouse en screen center
+            Vector2 distance = new Vector2(mousePosition.X - screenCenter.X, mousePosition.Y - screenCenter.Y);
+            distance.Normalize();
+
             cameraPosition = Vector3.Transform(spaceshipFollowPoint, spaceship.Transform);
             cameraLookAt = Vector3.Transform(spaceshipLookAtPoint, spaceship.Transform);
             cameraOrientationMatrix = spaceshipOrientationMatrix;
@@ -194,6 +212,10 @@ namespace SpaceSim
             lastMouseButton = mouseButton;
 
             skybox.Transform = Matrix.CreateScale(1000f) * Matrix.CreateTranslation(cameraPosition);
+
+            distance.X = -distance.X;
+            distance.Y = -distance.Y;
+
             // add earth rotation update
             Matrix earthRotation = Matrix.CreateRotationY((float) gameTime.ElapsedGameTime.TotalSeconds * 0.50f);
             earth.Transform = earth.Transform * earthRotation;
@@ -219,6 +241,88 @@ namespace SpaceSim
             moon.Transform *= Matrix.CreateRotationY((float) moonRotation);
             moon.Transform *= Matrix.CreateRotationX((float) Math.PI / 4);
             moon.Transform *= Matrix.CreateTranslation(Vector3.Transform(Vector3.Zero, earth.Transform));
+
+            // get user input to add to velocity
+            if (aKeyDown && rollVelocity < 200)
+            {
+
+                rollVelocity += 0.005f;
+            }
+
+            if (dKeyDown && rollVelocity > -200)
+            {
+
+                rollVelocity -= 0.005f;
+            }
+
+            if (wKeyDown && forwardVelocity < 0.25f)
+            {
+
+                forwardVelocity += 0.0005f;
+            }
+
+            if (sKeyDown && forwardVelocity > -0.25f)
+            {
+
+                forwardVelocity -= 0.0005f;
+            }
+
+            if (!wKeyDown && !sKeyDown)
+            {
+                forwardVelocity *= 0.96f;
+            }
+
+            // add velocity to ship
+            spaceshipPosition += forwardVelocity * spaceshipOrientationMatrix.Forward;
+            // orientate spaceship yaw pitch and roll
+            SpaceSim.RotateOrientationMatrixByYawPitchRoll(ref spaceshipOrientationMatrix, distance.X * 0.005f, distance.Y * 0.005f, rollVelocity);
+            spaceship.Transform = spaceshipOrientationMatrix * Matrix.CreateTranslation(spaceshipPosition);
+
+
+            // check if roll velocity goes above limits
+            if (rollVelocity > 200f)
+            {
+                rollVelocity = 200f;
+            }   
+            else if (rollVelocity < -200f)
+            {
+                rollVelocity = -200f;
+            }
+
+            // check if forward velocity goes above limits
+            if (forwardVelocity > 100f)
+            {
+                forwardVelocity = 100f;
+            }
+            else if (forwardVelocity < -100f)
+            {
+                forwardVelocity = -100f;
+            }
+
+            // add drag if no button is pressed
+            if (!aKeyDown && !dKeyDown)
+            {
+                rollVelocity *= 0.95f;
+            }
+            
+            // if mouse down shoot bullet
+            if (mouseDown)
+            {
+                bullets.Add(new Bullet(Vector3.Transform(bulletSpawnPosition, spaceship.Transform), spaceshipOrientationMatrix.Forward * (forwardVelocity + 10f)));
+            }
+
+            // update each bullet
+            foreach (Bullet bullet in bullets)
+            {
+                bullet.Update((float) gameTime.ElapsedGameTime.TotalSeconds);
+            }
+
+            // remove bullet if too far
+            for (int i = 0; i > bullets.Count; ++i)
+            {
+                if ((float)bullets[i].Position.Length() > 200)
+                    bullets.RemoveAt(i);
+            }
 
             base.Update(gameTime);
         }
