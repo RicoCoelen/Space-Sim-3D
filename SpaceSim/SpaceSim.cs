@@ -26,6 +26,11 @@ namespace SpaceSim
         List<Sphere> spheres;
 
         Sphere sun;
+        Sphere earth;
+        Sphere mars;
+        Sphere jupiter;
+        Sphere saturn;
+        Sphere uranus;
 
         Spaceship spaceship;
         Vector3 spaceshipPosition = new Vector3(0f, 28f, 77f);
@@ -77,9 +82,38 @@ namespace SpaceSim
 
             // change sun to yellow color
             spheres.Add(sun = new Sphere(Matrix.Identity, Color.Yellow, 30));
+            // added the rest of the planets
+            spheres.Add(earth = new Sphere(Matrix.Identity, Color.DeepSkyBlue, 16));
+            spheres.Add(mars = new Sphere(Matrix.Identity, Color.Red, 21));
+            spheres.Add(jupiter = new Sphere(Matrix.Identity, Color.Orange, 27));
+            spheres.Add(saturn = new Sphere(Matrix.Identity, Color.Khaki, 36));
+            spheres.Add(uranus = new Sphere(Matrix.Identity, Color.Cyan, 43));
+
             // scale the sun 2x
             sun.Transform = Matrix.CreateScale(2f);
+            // scale of the rest
+            earth.Transform = Matrix.CreateScale(1f);
+            mars.Transform = Matrix.CreateScale(0.6f);
+            jupiter.Transform = Matrix.CreateScale(1.7f);
+            saturn.Transform = Matrix.CreateScale(1.6f);
+            uranus.Transform = Matrix.CreateScale(1.5f);
 
+            // translate for position
+            earth.Transform *= Matrix.CreateTranslation(16f, 0.0f, 0.0f);
+            mars.Transform *= Matrix.CreateTranslation(21f, 0.0f, 0.0f);
+            jupiter.Transform *= Matrix.CreateTranslation(27f, 0.0f, 0.0f);
+            saturn.Transform *= Matrix.CreateTranslation(36f, 0.0f, 0.0f);
+            uranus.Transform *= Matrix.CreateTranslation(43f, 0.0f, 0.0f);
+
+            // use random class
+            Random rand = new Random();
+
+            // create rotation
+            earth.Transform *= Matrix.CreateRotationY((float)(rand.NextDouble() * 2.0 * Math.PI));
+            mars.Transform *= Matrix.CreateRotationY((float)(rand.NextDouble() * 2.0 * Math.PI));
+            jupiter.Transform *= Matrix.CreateRotationY((float)(rand.NextDouble() * 2.0 * Math.PI));
+            saturn.Transform *= Matrix.CreateRotationY((float)(rand.NextDouble() * 2.0 * Math.PI));
+            uranus.Transform *= Matrix.CreateRotationY((float)(rand.NextDouble() * 2.0 * Math.PI));
 
             base.Initialize();
         }
@@ -152,8 +186,21 @@ namespace SpaceSim
             lastMouseButton = mouseButton;
 
             skybox.Transform = Matrix.CreateScale(1000f) * Matrix.CreateTranslation(cameraPosition);
-
-
+            // add earth rotation update
+            Matrix earthRotation = Matrix.CreateRotationY((float) gameTime.ElapsedGameTime.TotalSeconds * 0.50f);
+            earth.Transform = earth.Transform * earthRotation;
+            // add mars rotation update
+            Matrix marsRotation = Matrix.CreateRotationY((float)gameTime.ElapsedGameTime.TotalSeconds * 0.30f);
+            mars.Transform = mars.Transform * marsRotation;
+            // add jupiter rotation update    
+            Matrix jupiterRotation = Matrix.CreateRotationY((float)gameTime.ElapsedGameTime.TotalSeconds * 0.20f);
+            jupiter.Transform = jupiter.Transform * jupiterRotation;
+            // add saturn rotation update
+            Matrix saturnRotation = Matrix.CreateRotationY((float)gameTime.ElapsedGameTime.TotalSeconds * 0.14f);
+            saturn.Transform = saturn.Transform * saturnRotation;
+            // add uranus rotation update
+            Matrix uranusRotation = Matrix.CreateRotationY((float)gameTime.ElapsedGameTime.TotalSeconds * 0.07f);
+            uranus.Transform = uranus.Transform * uranusRotation;
 
             base.Update(gameTime);
         }
