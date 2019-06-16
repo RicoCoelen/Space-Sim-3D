@@ -25,12 +25,17 @@ namespace SpaceSim
 
         List<Sphere> spheres;
 
+        // planets
         Sphere sun;
         Sphere earth;
         Sphere mars;
         Sphere jupiter;
         Sphere saturn;
         Sphere uranus;
+
+        // moons
+        Sphere moon;
+        double moonRotation = 0;
 
         Spaceship spaceship;
         Vector3 spaceshipPosition = new Vector3(0f, 28f, 77f);
@@ -91,7 +96,7 @@ namespace SpaceSim
 
             // scale the sun 2x
             sun.Transform = Matrix.CreateScale(2f);
-            // scale of the rest
+            // scale the rest
             earth.Transform = Matrix.CreateScale(1f);
             mars.Transform = Matrix.CreateScale(0.6f);
             jupiter.Transform = Matrix.CreateScale(1.7f);
@@ -105,7 +110,7 @@ namespace SpaceSim
             saturn.Transform *= Matrix.CreateTranslation(36f, 0.0f, 0.0f);
             uranus.Transform *= Matrix.CreateTranslation(43f, 0.0f, 0.0f);
 
-            // use random class
+            // used random class
             Random rand = new Random();
 
             // create rotation
@@ -114,6 +119,9 @@ namespace SpaceSim
             jupiter.Transform *= Matrix.CreateRotationY((float)(rand.NextDouble() * 2.0 * Math.PI));
             saturn.Transform *= Matrix.CreateRotationY((float)(rand.NextDouble() * 2.0 * Math.PI));
             uranus.Transform *= Matrix.CreateRotationY((float)(rand.NextDouble() * 2.0 * Math.PI));
+
+            // added the moon
+            spheres.Add(moon = new Sphere(Matrix.Identity, Color.LightGray, 30));
 
             base.Initialize();
         }
@@ -201,6 +209,16 @@ namespace SpaceSim
             // add uranus rotation update
             Matrix uranusRotation = Matrix.CreateRotationY((float)gameTime.ElapsedGameTime.TotalSeconds * 0.07f);
             uranus.Transform = uranus.Transform * uranusRotation;
+
+            // moon rotation update
+            moonRotation = moonRotation + gameTime.ElapsedGameTime.TotalSeconds * 1.5;
+            // scale and position of moon
+            moon.Transform = Matrix.CreateScale(0.5f);
+            moon.Transform *= Matrix.CreateTranslation(2f, 0.0f, 0.0f);
+            // create rotation on x and y relative to earth
+            moon.Transform *= Matrix.CreateRotationY((float) moonRotation);
+            moon.Transform *= Matrix.CreateRotationX((float) Math.PI / 4);
+            moon.Transform *= Matrix.CreateTranslation(Vector3.Transform(Vector3.Zero, earth.Transform));
 
             base.Update(gameTime);
         }
